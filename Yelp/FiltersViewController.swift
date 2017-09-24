@@ -8,9 +8,15 @@
 
 import UIKit
 
+@objc protocol FiltersViewControllerDelegate {
+    @objc optional func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters: [String: AnyObject])
+}
+
 class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SwitchCellDelegate {
 
     @IBOutlet var tableView: UITableView!
+    
+    weak var delegate: FiltersViewControllerDelegate?
     
     var categories: [[String: String]]!
     var switchStates = [Int:Bool]()
@@ -41,6 +47,8 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     @IBAction func onSearchButton(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
+        let filters = [String: AnyObject]()
+        delegate?.filtersViewController?(filtersViewController: self, didUpdateFilters: filters)
     }
     
     @IBAction func onCancelButton(_ sender: UIBarButtonItem) {
