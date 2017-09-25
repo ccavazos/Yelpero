@@ -205,7 +205,7 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
                 let rows = filters[indexPath.section]["cells"] as! [Dictionary<String, Any>]
                 let currentRow = rows[indexPath.row]
                 checkboxStates[indexPath.section]![indexPath.row] = currentRow["code"] as? Int
-                selectedFilters[indexPath.section] = currentRow["code"] as? Int!
+                selectedFilters[indexPath.section] = currentRow["code"] as? Int
                 filters[indexPath.section]["isCollapsed"] = true
             }
             tableView.reloadData()
