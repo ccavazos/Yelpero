@@ -12,19 +12,15 @@ struct YelpConstants {
     
     static let deals = [["name" : "Offering a Deal", "code" : false]]
 
-    static let distance = [
-        //["name" : "Selected", "code" : 0.0],
-                           ["name" : "Auto", "code" : 0.0],
-                           ["name" : "0.3 miles", "code" : 0.3],
-                           ["name" : "1 mile", "code" : 1.0],
-                           ["name" : "5 miles", "code" : 5.0],
-                           ["name" : "20 miles", "code" : 20.0]]
+    static let distance = [["name" : "Auto", "code" : 0],
+                           ["name" : "0.3 miles", "code" : 40],
+                           ["name" : "1 mile", "code" : 160],
+                           ["name" : "5 miles", "code" : 800],
+                           ["name" : "20 miles", "code" : 3200]]
     
-    static let sortBy = [
-        //["name" : "Selected", "code" : YelpSortMode.bestMatched],
-                         ["name" : "Best Match", "code" : YelpSortMode.bestMatched],
-                         ["name" : "Distance", "code" : YelpSortMode.distance],
-                         ["name" : "Highest Rated", "code" : YelpSortMode.highestRated]]
+    static let sortBy = [["name" : "Best Match", "code" : 0],
+                         ["name" : "Distance", "code" : 1],
+                         ["name" : "Highest Rated", "code" : 2]]
     
     static let categories = [["name" : "Afghan", "code": "afghani"],
                              ["name" : "African", "code": "african"],

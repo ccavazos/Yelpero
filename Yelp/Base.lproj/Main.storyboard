@@ -207,14 +207,21 @@
                                                     <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Dropdown" translatesAutoresizingMaskIntoConstraints="NO" id="17v-ah-Bbj">
+                                                    <rect key="frame" x="327" y="8" width="30" height="30"/>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="17v-ah-Bbj" firstAttribute="centerY" secondItem="Ntq-ry-Gun" secondAttribute="centerY" id="4E6-hG-W8E"/>
+                                                <constraint firstItem="17v-ah-Bbj" firstAttribute="top" secondItem="Ntq-ry-Gun" secondAttribute="top" constant="8" id="JMy-dW-cbA"/>
+                                                <constraint firstAttribute="trailing" secondItem="17v-ah-Bbj" secondAttribute="trailing" constant="18" id="NhB-dq-X2E"/>
                                                 <constraint firstItem="nsd-iR-NT6" firstAttribute="leading" secondItem="Ntq-ry-Gun" secondAttribute="leadingMargin" constant="10" id="ThV-ze-q86"/>
                                                 <constraint firstItem="nsd-iR-NT6" firstAttribute="centerY" secondItem="Ntq-ry-Gun" secondAttribute="centerY" id="md9-KH-sm7"/>
                                                 <constraint firstItem="nsd-iR-NT6" firstAttribute="top" secondItem="Ntq-ry-Gun" secondAttribute="topMargin" constant="4" id="tcJ-f4-xWk"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="checkboxImageView" destination="17v-ah-Bbj" id="7E9-hd-HBf"/>
                                             <outlet property="checkboxLabel" destination="nsd-iR-NT6" id="eSU-9o-knc"/>
                                         </connections>
                                     </tableViewCell>
@@ -294,4 +301,7 @@
             <point key="canvasLocation" x="3812" y="-43.628185907046479"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Dropdown" width="30" height="30"/>
+    </resources>
 </document>

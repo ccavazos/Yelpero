@@ -17,9 +17,9 @@ let yelpConsumerSecret = "33QCvh5bIF5jIHR5klQr7RtBDhQ"
 let yelpToken = "uRcRswHFYa1VkDrGV6LAW2F8clGh5JHV"
 let yelpTokenSecret = "mqtKIxMIR4iBtBPZCmCLEb-Dz3Y"
 
-enum YelpSortMode: Int {
-    case bestMatched = 0, distance, highestRated
-}
+//enum YelpSortMode: Int {
+//    case bestMatched = 0, distance, highestRated
+//}
 
 class YelpClient: BDBOAuth1RequestOperationManager {
     var accessToken: String!
@@ -44,17 +44,17 @@ class YelpClient: BDBOAuth1RequestOperationManager {
     }
     
     func searchWithTerm(_ term: String, completion: @escaping ([Business]?, Error?) -> Void) -> AFHTTPRequestOperation {
-        return searchWithTerm(term, sort: nil, categories: nil, deals: nil, completion: completion)
+        return searchWithTerm(term, sort: nil, categories: nil, deals: nil, distance: nil, completion: completion)
     }
     
-    func searchWithTerm(_ term: String, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: @escaping ([Business]?, Error?) -> Void) -> AFHTTPRequestOperation {
+    func searchWithTerm(_ term: String, sort: Int?, categories: [String]?, deals: Bool?, distance: Int?, completion: @escaping ([Business]?, Error?) -> Void) -> AFHTTPRequestOperation {
         // For additional parameters, see http://www.yelp.com/developers/documentation/v2/search_api
         
         // Default the location to San Francisco
         var parameters: [String : AnyObject] = ["term": term as AnyObject, "ll": "37.785771,-122.406165" as AnyObject]
         
         if sort != nil {
-            parameters["sort"] = sort!.rawValue as AnyObject?
+            parameters["sort"] = sort! as AnyObject?
         }
         
         if categories != nil && categories!.count > 0 {
@@ -63,6 +63,10 @@ class YelpClient: BDBOAuth1RequestOperationManager {
         
         if deals != nil {
             parameters["deals_filter"] = deals! as AnyObject?
+        }
+        
+        if distance != nil && distance != 0 {
+            parameters["radius_filter"] = distance! as AnyObject?
         }
         
         print(parameters)

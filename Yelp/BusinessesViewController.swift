@@ -44,14 +44,11 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     func fetchDefaultRestaurants() {
         searchBar.text = defaultSearchTerm
-        Business.searchWithTerm(term: defaultSearchTerm, completion: { (businesses: [Business]?, error: Error?) -> Void in
-            self.businesses = businesses
-            self.tableView.reloadData()
-        })
+        fetchData()
     }
     
     func fetchData() {
-        Business.searchWithTerm(term: searchBar.text!, sort: YelpSortMode.distance, categories: nil, deals: false) { (businessResults: [Business]!, error: Error!) in
+        Business.searchWithTerm(term: searchBar.text!, sort: 0, categories: nil, deals: false, distance: nil) { (businessResults: [Business]!, error: Error!) in
             self.businesses = businessResults
             self.tableView.reloadData()
         }
@@ -92,11 +89,11 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     // MARK: - FiltersViewController Delegate
     
-    func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters: [String : AnyObject]) {
-        
-        // TODO: Update the filters
-        
-        fetchData()
+    func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters: [Any]) {
+        Business.searchWithTerm(term: searchBar.text!, sort: didUpdateFilters[2] as? Int, categories: didUpdateFilters[3] as? [String], deals: didUpdateFilters[0] as? Bool, distance: didUpdateFilters[1] as? Int) { (businessResults: [Business]!, error: Error!) in
+            self.businesses = businessResults
+            self.tableView.reloadData()
+        }
     }
     
     // MARK: - Navigation

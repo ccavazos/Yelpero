@@ -9,7 +9,7 @@
 import UIKit
 
 @objc protocol FiltersViewControllerDelegate {
-    @objc optional func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters: [String: AnyObject])
+    @objc optional func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters: [Any])
 }
 
 class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SwitchCellDelegate {
@@ -40,11 +40,19 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
             "section" : "Categories",
             "type" : "SwitchCell",
             "cells" : YelpConstants.categories,
-            "isCollapsed" : true
+//            "isCollapsed" : true
         ],
     ]
     
-    var switchStates = [Int:Bool]()
+    var selectedFilters: [Any] = [
+        false,
+        0,
+        0,
+        [String]()
+    ]
+    
+    var switchStates = [Int:[Int:Bool]]()
+    var checkboxStates = [Int:[Int:Int]]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,8 +73,22 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     @IBAction func onSearchButton(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
-        let filters = [String: AnyObject]()
-        delegate?.filtersViewController?(filtersViewController: self, didUpdateFilters: filters)
+        // Updates the deals option
+        selectedFilters[0] = switchStates[0]?[0] ?? false
+        // Updates the cateogory
+        
+        var selectedCategories = [String]()
+        if let categoriesSwitches = switchStates[3] {
+            for (row, isSelected) in categoriesSwitches {
+                if (isSelected) {
+                    selectedCategories.append(YelpConstants.categories[row]["code"]!)
+                }
+            }
+        }
+
+        selectedFilters[3] = selectedCategories;
+        
+        delegate?.filtersViewController?(filtersViewController: self, didUpdateFilters: selectedFilters)
     }
     
     @IBAction func onCancelButton(_ sender: UIBarButtonItem) {
@@ -80,7 +102,12 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        return false
+        let cellType = filters[indexPath.section]["type"] as! String
+        if cellType == "SwitchCell" {
+            return false
+        } else {
+            return true
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -92,14 +119,25 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
         let rows = filters[section]["cells"] as! [Dictionary<String, Any>]
         let cellType = filters[section]["type"] as! String
         if (cellType == "SwitchCell") {
-            return rows.count
+            if let isCollapsed = filters[section]["isCollapsed"] as? Bool {
+                print("Is Collapsed \(isCollapsed)")
+                // TODO: Implement this
+//                if isCollapsed && rows.count > 5 {
+//                    return 5
+//                } else {
+//                    return rows.count
+//                }
+                return rows.count
+            } else {
+                return rows.count
+            }
+            
         } else if (cellType == "CheckboxCell") {
             let isCollapsed = filters[section]["isCollapsed"] as! Bool
             if isCollapsed == true {
                 // We only need to show the selected value
                 return 1
             } else {
-                // Show all the values
                 return rows.count
             }
         } else {
@@ -119,7 +157,11 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
             cell.switchLabel.text = currentRow["name"] as? String
             cell.delegate = self
             
-            cell.onSwitch.isOn = switchStates[indexPath.row] ?? false
+            if switchStates[indexPath.section] != nil {
+                cell.onSwitch.isOn = switchStates[indexPath.section]![indexPath.row] ?? false
+            } else {
+                cell.onSwitch.isOn = false
+            }
             
             return cell
         } else if cellType == "CheckboxCell" {
@@ -128,15 +170,20 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
             let isCollapsed = filters[indexPath.section]["isCollapsed"] as! Bool
             
             if isCollapsed == true {
-                // We only need to show the selected value
-                // TODO: Show the right value
-                cell.checkboxLabel.text = currentRow["name"] as? String
+                var selectedRow = rows.first(where: { $0["code"] as! Int == selectedFilters[indexPath.section] as! Int } )
+                cell.checkboxLabel.text = selectedRow?["name"] as? String
+                cell.checkboxImageView.image = UIImage(named: "Dropdown")
+                cell.checkboxImageView.isHidden = false
             } else {
                 // Show all the values
                 cell.checkboxLabel.text = currentRow["name"] as? String
+                cell.checkboxImageView.image = UIImage(named: "Radio")
+                if currentRow["code"] as! Int == selectedFilters[indexPath.section] as! Int {
+                    cell.checkboxImageView.isHidden = false
+                } else {
+                    cell.checkboxImageView.isHidden = true
+                }
             }
-            
-//            cell.delegate = self
             
             return cell
         }
@@ -147,10 +194,21 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var filter = filters[indexPath.section]
         if let isCollapsed = filter["isCollapsed"] as? Bool {
-            print("collapsed does not exist")
-            print(isCollapsed)
-        } else {
-            print("collapsed does not exist")
+            if isCollapsed {
+                // We should open it
+                filters[indexPath.section]["isCollapsed"] = false
+            } else {
+                // We should update the value and close it
+                if checkboxStates[indexPath.section] == nil {
+                    checkboxStates[indexPath.section] = [Int:Int]()
+                }
+                let rows = filters[indexPath.section]["cells"] as! [Dictionary<String, Any>]
+                let currentRow = rows[indexPath.row]
+                checkboxStates[indexPath.section]![indexPath.row] = currentRow["code"] as? Int
+                selectedFilters[indexPath.section] = currentRow["code"] as? Int!
+                filters[indexPath.section]["isCollapsed"] = true
+            }
+            tableView.reloadData()
         }
     }
     
@@ -158,7 +216,10 @@ class FiltersViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func switchCell(switchCell: SwitchCell, didChangeValue value: Bool) {
         let indexPath = tableView.indexPath(for: switchCell)!
-        switchStates[indexPath.row] = value
+        if switchStates[indexPath.section] == nil {
+            switchStates[indexPath.section] = [Int:Bool]()
+        }
+        switchStates[indexPath.section]![indexPath.row] = value
     }
 
 }
